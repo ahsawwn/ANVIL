@@ -1,10 +1,11 @@
 import logging
+import os
 import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from config.settings import VAULT_ROOT
+from config.settings import OWNER_GID, OWNER_UID, VAULT_ROOT
 from models.scan_result import Port, ScanReport, Vulnerability
 
 logger = logging.getLogger(__name__)
@@ -18,6 +19,17 @@ class MarkdownGenerator:
         self.attacks_dir = self.root / "Attacks"
         for directory in (self.root, self.targets_dir, self.services_dir, self.attacks_dir):
             directory.mkdir(parents=True, exist_ok=True)
+        self.ensure_ownership()
+
+    def ensure_ownership(self) -> None:
+        if os.geteuid() != 0:
+            return
+        try:
+            for path in list(self.root.rglob("*")) + [self.root]:
+                os.chown(path, OWNER_UID, OWNER_GID)
+                os.chmod(path, 0o755 if path.is_dir() else 0o644)
+        except OSError as exc:
+            logger.error("Could not set vault ownership: %s", exc)
 
     @staticmethod
     def _slug(text: str, fallback: str = "item") -> str:
@@ -54,6 +66,7 @@ class MarkdownGenerator:
                         attack_file.write_text(self._attack_md(vuln), encoding="utf-8")
 
             self._generate_index()
+            self.ensure_ownership()
             logger.info("Vault updated for %s", report.target)
         except Exception as exc:
             logger.error("Markdown generation failed: %s", exc)
@@ -74,6 +87,7 @@ class MarkdownGenerator:
                         migrated += 1
             if migrated:
                 self._generate_index()
+                self.ensure_ownership()
                 logger.info("Migrated %d note(s) from legacy vault %s", migrated, legacy_root)
         except Exception as exc:
             logger.error("Legacy vault migration failed: %s", exc)

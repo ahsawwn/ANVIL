@@ -23,6 +23,22 @@ def _owner_home() -> Path:
 
 OWNER_HOME = _owner_home()
 
+
+def _owner_ids() -> tuple[int, int]:
+    for var, is_name in (("SUDO_USER", True), ("PKEXEC_UID", False)):
+        value = os.environ.get(var)
+        if not value:
+            continue
+        try:
+            pw = pwd.getpwnam(value) if is_name else pwd.getpwuid(int(value))
+            return pw.pw_uid, pw.pw_gid
+        except (KeyError, ValueError, ImportError, OSError):
+            continue
+    return os.getuid(), os.getgid()
+
+
+OWNER_UID, OWNER_GID = _owner_ids()
+
 NMAP_PATH = Path("/usr/bin/nmap")
 SCAN_OUTPUT_PATH = Path("/tmp/anvil_scan.xml")
 PROXYCHAINS_CONF_PATH = Path("/tmp/anvil_proxy.conf")
