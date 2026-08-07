@@ -1,0 +1,385 @@
+[
+  {
+    "service": "smb",
+    "port": 445,
+    "version_keyword": "Windows 7|Windows 10|Windows Server 2008|SMBv1",
+    "vulnerabilities": [
+      {
+        "name": "MS17-010 EternalBlue",
+        "cve": "CVE-2017-0144",
+        "exploit_db": "42315",
+        "msf_module": "exploit/windows/smb/ms17_010_eternalblue",
+        "risk": "Critical",
+        "remediation": "Apply Microsoft patch MS17-010 and disable SMBv1 where possible."
+      },
+      {
+        "name": "MS08-067 NetAPI32 RCE",
+        "cve": "CVE-2008-4250",
+        "exploit_db": "7104",
+        "msf_module": "exploit/windows/smb/ms08_067_netapi",
+        "risk": "Critical",
+        "remediation": "Install the MS08-067 security update and isolate legacy Windows hosts."
+      },
+      {
+        "name": "SMB Relay (NTLM) / Signing Disabled",
+        "cve": "CVE-2009-3103",
+        "exploit_db": "40339",
+        "msf_module": "exploit/windows/smb/smb_relay",
+        "risk": "High",
+        "remediation": "Enable SMB signing and enforce SMBv2+ across the domain."
+      }
+    ]
+  },
+  {
+    "service": "ssh",
+    "port": 22,
+    "version_keyword": "OpenSSH 7.2|OpenSSH 7.4",
+    "vulnerabilities": [
+      {
+        "name": "OpenSSH User Enumeration",
+        "cve": "CVE-2018-15473",
+        "exploit_db": "45939",
+        "msf_module": "auxiliary/scanner/ssh/ssh_enumusers",
+        "risk": "Medium",
+        "remediation": "Upgrade OpenSSH to a patched release (>= 7.7 on affected distros)."
+      },
+      {
+        "name": "SSH Weak Credentials",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/ssh/ssh_login",
+        "risk": "High",
+        "remediation": "Enforce key-based authentication and disable password login."
+      }
+    ]
+  },
+  {
+    "service": "http",
+    "port": 80,
+    "version_keyword": "Apache|nginx|IIS",
+    "vulnerabilities": [
+      {
+        "name": "Directory Bruteforce",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/http/dir_scanner",
+        "risk": "Low",
+        "remediation": "Harden web root permissions and review exposed directories."
+      },
+      {
+        "name": "Apache Path Traversal / Traversal",
+        "cve": "CVE-2021-41773",
+        "exploit_db": "50446",
+        "msf_module": "exploit/multi/http/apache_normalize_path_rce",
+        "risk": "Critical",
+        "remediation": "Upgrade Apache to >= 2.4.50 with the access-control fix applied."
+      },
+      {
+        "name": "Log4Shell (Log4j RCE)",
+        "cve": "CVE-2021-44228",
+        "exploit_db": "50794",
+        "msf_module": "exploit/multi/http/log4j_headers_injection",
+        "risk": "Critical",
+        "remediation": "Upgrade Log4j to 2.17.1+ or apply the mitigation flag JVM_OPT='-Dlog4j2.formatMsgNoLookups=true'."
+      }
+    ]
+  },
+  {
+    "service": "https",
+    "port": 443,
+    "version_keyword": "Apache|nginx|IIS|OpenSSL",
+    "vulnerabilities": [
+      {
+        "name": "OpenSSL Heartbleed",
+        "cve": "CVE-2014-0160",
+        "exploit_db": "32745",
+        "msf_module": "auxiliary/scanner/ssl/openssl_heartbleed",
+        "risk": "High",
+        "remediation": "Upgrade OpenSSL and revoke any keys potentially exposed via heartbeat."
+      },
+      {
+        "name": "Log4Shell (Log4j RCE)",
+        "cve": "CVE-2021-44228",
+        "exploit_db": "50794",
+        "msf_module": "exploit/multi/http/log4j_headers_injection",
+        "risk": "Critical",
+        "remediation": "Upgrade Log4j to 2.17.1+ and scan for nested libraries using vulnerable versions."
+      },
+      {
+        "name": "Weak TLS Cipher Suite",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/ssl/ssl_version",
+        "risk": "Medium",
+        "remediation": "Disable SSLv3/TLSv1.0 and enforce modern cipher suites."
+      }
+    ]
+  },
+  {
+    "service": "ftp",
+    "port": 21,
+    "version_keyword": "vsftpd|ProFTPD|IIS",
+    "vulnerabilities": [
+      {
+        "name": "vsftpd 2.3.4 Backdoor",
+        "cve": "CVE-2011-2523",
+        "exploit_db": "17491",
+        "msf_module": "exploit/unix/ftp/vsftpd_234_backdoor",
+        "risk": "Critical",
+        "remediation": "Upgrade vsftpd and block access from untrusted networks."
+      },
+      {
+        "name": "FTP Anonymous Login",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/ftp/anonymous",
+        "risk": "Medium",
+        "remediation": "Disable anonymous FTP access and enforce strong credentials."
+      }
+    ]
+  },
+  {
+    "service": "mysql",
+    "port": 3306,
+    "version_keyword": "5.1|5.5|5.6|MariaDB",
+    "vulnerabilities": [
+      {
+        "name": "MySQL Authentication Bypass",
+        "cve": "CVE-2012-2122",
+        "exploit_db": "16990",
+        "msf_module": "auxiliary/scanner/mysql/mysql_authbypass_hashdump",
+        "risk": "High",
+        "remediation": "Upgrade MySQL/MariaDB and restrict the service to trusted hosts."
+      },
+      {
+        "name": "MySQL Weak Credentials",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/mysql/mysql_login",
+        "risk": "High",
+        "remediation": "Set strong passwords and disable remote root access."
+      }
+    ]
+  },
+  {
+    "service": "postgresql",
+    "port": 5432,
+    "version_keyword": "9.3|9.4|9.5|9.6|10|11",
+    "vulnerabilities": [
+      {
+        "name": "PostgreSQL Superuser Command Execution",
+        "cve": "CVE-2019-9193",
+        "exploit_db": "46749",
+        "msf_module": "exploit/postgres/postgres_pg_exec",
+        "risk": "High",
+        "remediation": "Revoke the pg_execute_server_program role from non-admin users."
+      },
+      {
+        "name": "PostgreSQL Weak Credentials",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/postgres/postgres_login",
+        "risk": "High",
+        "remediation": "Enforce strong passwords and IP-level access control in pg_hba.conf."
+      }
+    ]
+  },
+  {
+    "service": "ms-wbt-server",
+    "port": 3389,
+    "version_keyword": "Windows 7|Windows 10|Windows Server 2008|Windows Server 2012",
+    "vulnerabilities": [
+      {
+        "name": "BlueKeep (RDP RCE)",
+        "cve": "CVE-2019-0708",
+        "exploit_db": "43970",
+        "msf_module": "exploit/windows/rdp/cve_2019_0708_bluekeep_rce",
+        "risk": "Critical",
+        "remediation": "Apply the BlueKeep security update and enable Network Level Authentication."
+      },
+      {
+        "name": "RDP Exposed / Weak Auth",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/rdp/rdp_scanner",
+        "risk": "High",
+        "remediation": "Disable RDP from the internet or put it behind a VPN and enforce NLA."
+      }
+    ]
+  },
+  {
+    "service": "snmp",
+    "port": 161,
+    "version_keyword": "NET-SNMP|Cisco|public",
+    "vulnerabilities": [
+      {
+        "name": "SNMP Default Community String",
+        "cve": "CVE-1999-0517",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/snmp/snmp_enum",
+        "risk": "High",
+        "remediation": "Change community strings from 'public'/'private' and restrict SNMP by ACL."
+      },
+      {
+        "name": "SNMP Credential Bruteforce",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/snmp/snmp_login",
+        "risk": "Medium",
+        "remediation": "Use long, random community strings and SNMPv3 with auth/privacy."
+      }
+    ]
+  },
+  {
+    "service": "redis",
+    "port": 6379,
+    "version_keyword": "Redis 4.0|Redis 5.0|Redis 6.0",
+    "vulnerabilities": [
+      {
+        "name": "Redis Unauthenticated RCE",
+        "cve": "CVE-2022-0543",
+        "exploit_db": "50779",
+        "msf_module": "exploit/linux/redis/redis_unauth_rce",
+        "risk": "Critical",
+        "remediation": "Require authentication, bind to loopback, and disable dangerous commands."
+      },
+      {
+        "name": "Redis Weak Password",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/redis/redis_login",
+        "risk": "High",
+        "remediation": "Set a strong requirepass value and disable CONFIG on untrusted clients."
+      }
+    ]
+  },
+  {
+    "service": "ms-sql-s",
+    "port": 1433,
+    "version_keyword": "Microsoft SQL|MSSQL",
+    "vulnerabilities": [
+      {
+        "name": "MSSQL Weak Credentials",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/mssql/mssql_login",
+        "risk": "High",
+        "remediation": "Enforce strong SA passwords and Windows Authentication mode."
+      },
+      {
+        "name": "MSSQL Command Execution via xp_cmdshell",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "exploit/windows/mssql/mssql_exec",
+        "risk": "High",
+        "remediation": "Disable xp_cmdshell and grant least-privilege SQL accounts."
+      }
+    ]
+  },
+  {
+    "service": "vnc",
+    "port": 5900,
+    "version_keyword": "VNC|RealVNC|TightVNC",
+    "vulnerabilities": [
+      {
+        "name": "VNC Authentication Bypass",
+        "cve": "CVE-2006-2369",
+        "exploit_db": "1898",
+        "msf_module": "auxiliary/scanner/vnc/vnc_none_auth",
+        "risk": "Medium",
+        "remediation": "Patch VNC servers and require strong, non-empty passwords."
+      },
+      {
+        "name": "VNC Weak Password",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/vnc/vnc_login",
+        "risk": "High",
+        "remediation": "Use long passwords and connect over an encrypted tunnel."
+      }
+    ]
+  },
+  {
+    "service": "smtp",
+    "port": 25,
+    "version_keyword": "Postfix|Exim|Sendmail|OpenSMTPD",
+    "vulnerabilities": [
+      {
+        "name": "SMTP User Enumeration (VRFY/EXPN)",
+        "cve": "CVE-2020-7247",
+        "exploit_db": "47889",
+        "msf_module": "auxiliary/scanner/smtp/smtp_enum",
+        "risk": "Medium",
+        "remediation": "Disable VRFY/EXPN and rate-limit SMTP connections."
+      },
+      {
+        "name": "OpenSMTPD RCE",
+        "cve": "CVE-2020-7247",
+        "exploit_db": "48142",
+        "msf_module": "exploit/unix/smtp/opensmtpd_mail_from_rce",
+        "risk": "Critical",
+        "remediation": "Upgrade OpenSMTPD to a patched version immediately."
+      }
+    ]
+  },
+  {
+    "service": "telnet",
+    "port": 23,
+    "version_keyword": "Linux|RouterOS|Cisco",
+    "vulnerabilities": [
+      {
+        "name": "Telnet Weak Credentials",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/telnet/telnet_login",
+        "risk": "High",
+        "remediation": "Replace Telnet with SSH and enforce strong credentials."
+      }
+    ]
+  },
+  {
+    "service": "mongodb",
+    "port": 27017,
+    "version_keyword": "MongoDB 2.6|MongoDB 3.0|MongoDB 4.0|MongoDB 4.2",
+    "vulnerabilities": [
+      {
+        "name": "MongoDB Authentication Disabled",
+        "cve": "CVE-2013-3960",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/mongodb/mongodb_login",
+        "risk": "High",
+        "remediation": "Enable MongoDB authentication and bind to loopback/private networks only."
+      }
+    ]
+  },
+  {
+    "service": "docker",
+    "port": 2375,
+    "version_keyword": "Docker 18|Docker 19|Docker 20",
+    "vulnerabilities": [
+      {
+        "name": "Docker Remote API Unauthenticated",
+        "cve": "CVE-2018-15393",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/http/docker_daemon_info",
+        "risk": "Critical",
+        "remediation": "Never expose the Docker API unauthenticated; use TLS and bind to loopback."
+      }
+    ]
+  },
+  {
+    "service": "nfs",
+    "port": 2049,
+    "version_keyword": "nfs|NFSv4",
+    "vulnerabilities": [
+      {
+        "name": "NFS Mount Misconfiguration",
+        "cve": "N/A",
+        "exploit_db": "N/A",
+        "msf_module": "auxiliary/scanner/nfs/nfsmount",
+        "risk": "Medium",
+        "remediation": "Export with root_squash and restrict to trusted hosts in /etc/exports."
+      }
+    ]
+  }
+]

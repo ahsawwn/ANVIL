@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Scan artifacts
+/tmp/anvil_scan.xml
+
+# Runtime data
+.anvil/
+anvil.log
+
+# Obsidian vault (user data lives in home dir, not the repo)
+anvil_vault/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Test artifacts
+*.pem
+*.key
