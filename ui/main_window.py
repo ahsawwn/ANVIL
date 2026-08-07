@@ -1,4 +1,5 @@
 import logging
+import os
 import threading
 from pathlib import Path
 
@@ -39,12 +40,15 @@ class MainWindow(QMainWindow):
 
         self.proxy_manager = ProxyManager()
         self.markdown_generator = MarkdownGenerator()
+        if os.geteuid() == 0:
+            self.markdown_generator.migrate_legacy_vault(Path("/root/anvil_vault"))
 
         self._thread: QThread | None = None
         self._worker: ScanWorker | None = None
 
         self._build_ui()
         self.status_message.connect(self.console.append_info)
+        self.console.append_info(f"Obsidian vault: {VAULT_ROOT}")
         self.refresh_vault()
 
     def _build_ui(self) -> None:

@@ -50,8 +50,12 @@ def _port_from_dict(port_id: str, protocol: str, info: dict) -> Port:
 def _parse_python_nmap(path: Path, target: str, profile: ScanProfile, use_tor: bool) -> ScanReport:
     import nmap
 
+    xml_data = path.read_text(errors="replace")
     scanner = nmap.PortScanner()
-    scanner.parse(path.read_text(errors="replace"))
+    if hasattr(scanner, "analyse_nmap_xml_scan"):
+        scanner.analyse_nmap_xml_scan(xml_data)
+    else:
+        scanner.parse(xml_data)
 
     report = _new_report(target, profile, use_tor)
     for host in scanner.all_hosts():

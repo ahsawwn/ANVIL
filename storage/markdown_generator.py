@@ -34,10 +34,6 @@ class MarkdownGenerator:
 
     def generate(self, report: ScanReport) -> None:
         try:
-            if not report.open_ports:
-                logger.info("No open ports for %s; skipping vault write", report.target)
-                return
-
             target_slug = self._safe_target(report.target)
             report_file = self.targets_dir / f"{target_slug}.md"
             report_file.write_text(self._target_md(report), encoding="utf-8")
@@ -62,6 +58,26 @@ class MarkdownGenerator:
         except Exception as exc:
             logger.error("Markdown generation failed: %s", exc)
 
+    def migrate_legacy_vault(self, legacy_root: Path) -> None:
+        try:
+            if not legacy_root.exists() or legacy_root.resolve() == self.root.resolve():
+                return
+            migrated = 0
+            for sub in ("Targets", "Services", "Attacks"):
+                source = legacy_root / sub
+                if not source.is_dir():
+                    continue
+                for src in source.glob("*.md"):
+                    dst = self.root / sub / src.name
+                    if not dst.exists():
+                        dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+                        migrated += 1
+            if migrated:
+                self._generate_index()
+                logger.info("Migrated %d note(s) from legacy vault %s", migrated, legacy_root)
+        except Exception as exc:
+            logger.error("Legacy vault migration failed: %s", exc)
+
     def _target_md(self, report: ScanReport) -> str:
         lines = [
             f"# Target: {report.target}",
@@ -74,25 +90,29 @@ class MarkdownGenerator:
             f"- **Critical Vulnerabilities**: {report.critical_count}",
             f"- **Total Vulnerabilities**: {len(report.vulnerabilities)}",
             "",
-            "## Open Ports",
+            "## Ports",
             "",
             "| Port | Protocol | Service | Version | State |",
             "|---|---|---|---|---|",
         ]
-        for port in report.open_ports:
+        for port in report.ports:
             lines.append(
                 f"| {port.port_id} | {port.protocol} | {self._escape_cell(port.service)} | "
                 f"{self._escape_cell(port.version_text)} | {port.state} |"
             )
         lines.append("")
-        lines.append("## Findings")
+        if report.open_ports:
+            lines.append("## Findings")
+            lines.append("")
+            for port in report.open_ports:
+                service_slug = self._slug(
+                    f"{self._safe_target(report.target)}_{port.port_id}_{port.service}",
+                    fallback=f"{self._safe_target(report.target)}_{port.port_id}",
+                )
+                lines.append(f"- [[Services/{service_slug}]]")
+        else:
+            lines.append("_No open ports detected on this target._")
         lines.append("")
-        for port in report.open_ports:
-            service_slug = self._slug(
-                f"{self._safe_target(report.target)}_{port.port_id}_{port.service}",
-                fallback=f"{self._safe_target(report.target)}_{port.port_id}",
-            )
-            lines.append(f"- [[Services/{service_slug}]]")
         return "\n".join(lines) + "\n"
 
     def _service_md(self, report: ScanReport, port: Port, vulns: list) -> str:
@@ -141,21 +161,22 @@ class MarkdownGenerator:
         rows = []
         for path in sorted(self.targets_dir.glob("*.md")):
             rows.append((path.stem, path.stat().st_mtime))
-        if not rows:
-            return
         lines = [
             "# Anvil Scan Index",
             "",
-            "> Obsidian vault of all Anvil scan results.",
+            "> Obsidian vault of all Anvil scan results. Run a scan from Anvil and the notes will appear here.",
             "",
             "## Scans",
             "",
             "| Target | Last Modified |",
             "|---|---|",
         ]
-        for stem, mtime in rows:
-            date = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
-            lines.append(f"| [[Targets/{stem}]] | {date} |")
+        if rows:
+            for stem, mtime in rows:
+                date = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
+                lines.append(f"| [[Targets/{stem}]] | {date} |")
+        else:
+            lines.append("| _No scans yet_ | _-_ |")
         index_path = self.root / "Index.md"
         index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
